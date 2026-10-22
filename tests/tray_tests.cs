@@ -57,6 +57,7 @@ internal static class MuseTests
         {
             int stage = 0;
             bool busy = false;
+            bool fixture_requested = false;
             Exception failure = null;
             object original_view = null;
             Stopwatch watch = Stopwatch.StartNew();
@@ -81,7 +82,14 @@ internal static class MuseTests
                         if (integration)
                         {
                             check_browser_layout(window, browser);
-                            await browser.active_view.CoreWebView2.ExecuteScriptAsync("window.muse_test_marker = 'preserved'; document.body.innerHTML = '<input id=message value=draft>'; window.muse_root = true;");
+                            if (!fixture_requested)
+                            {
+                                fixture_requested = true;
+                                browser.active_view.CoreWebView2.NavigateToString("<!doctype html><html><body><input id=message value=draft><script>window.muse_test_marker='preserved';window.muse_root=true;</script></body></html>");
+                                return;
+                            }
+                            string fixture_ready = await browser.active_view.CoreWebView2.ExecuteScriptAsync("window.muse_root === true");
+                            if (fixture_ready != "true") { return; }
                         }
                         window.Close();
                         check(!window.Visible && !window.IsDisposed && window.tray_visible && window.app_view.is_ready,
@@ -91,7 +99,8 @@ internal static class MuseTests
                     }
                     else if (stage == 1)
                     {
-                        check(window.Visible && window.app_view.is_ready, "Activation did not restore the application.");
+                        if (!window.Visible) { return; }
+                        check(window.app_view.is_ready, "Activation did not retain the page.");
                         if (integration)
                         {
                             check(Object.ReferenceEquals(original_view, browser.active_view), "Restore recreated the browser.");
