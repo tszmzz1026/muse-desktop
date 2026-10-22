@@ -1,0 +1,14 @@
+/dist/
+/packages/
+/tools/
+/release/
+/test-results/
+*.user
+*.suo
+.vs/
+.env
+*.pfx
+*.p12
+diagnostics.json
+window_state.json
+WebView2/

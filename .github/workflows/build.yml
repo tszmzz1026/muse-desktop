@@ -1,0 +1,38 @@
+name: Build Windows packages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        shell: powershell
+        run: ./scripts/build.ps1
+      - name: Check tray and window state
+        shell: powershell
+        run: ./scripts/test.ps1
+      - name: Build distribution packages
+        shell: powershell
+        run: ./scripts/package.ps1
+      - name: Test installer and portable package
+        shell: powershell
+        run: ./scripts/test_distribution.ps1 -Installer
+      - name: Test WebView2 interface
+        shell: powershell
+        run: ./scripts/test.ps1 -Integration
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Muse-Desktop-windows-x64
+          path: |
+            release/*.exe
+            release/*.zip
+            release/SHA256SUMS.txt
