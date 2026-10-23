@@ -63,12 +63,16 @@ class SessionStore {
     save() {
         this.pending = this.pending.then(async () => {
             const cookies = (await this.browser_session.cookies.get({})).filter((cookie) => cookie.session && is_muse_domain(cookie.domain));
-            if (this.encryption_available) {
-                if (cookies.length === 0) {
-                    fs.rmSync(this.file_path, { force: true });
-                } else {
+            if (cookies.length === 0) {
+                fs.rmSync(this.file_path, { force: true });
+                this.last_cookies = undefined;
+            } else if (this.encryption_available) {
+                const serialized_cookies = JSON.stringify(cookies);
+                if (serialized_cookies !== this.last_cookies || Date.now() - this.last_save >= 86400000) {
                     const serialized = JSON.stringify({ version: 1, saved_at: Date.now(), cookies });
                     write_private(this.file_path, this.safe_storage.encryptString(serialized));
+                    this.last_cookies = serialized_cookies;
+                    this.last_save = Date.now();
                 }
             }
             await this.browser_session.cookies.flushStore();

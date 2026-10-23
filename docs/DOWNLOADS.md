@@ -1,6 +1,27 @@
 # Muse Desktop 使用说明
 
-Muse.ai 非官方 Windows 桌面客户端。适用于 Windows 10 2004 及以上版本、Windows 11，64 位系统。网站功能需要联网及你自己的 Muse 账户。
+Muse.ai 非官方 Windows / Linux 桌面客户端。Windows 支持 Windows 10 2004 及以上版本、Windows 11；Linux 提供 x86_64 版本。网站功能需要联网及你自己的 Muse 账户。
+
+## Linux
+
+Ubuntu / Debian / Linux Mint 推荐下载 `.deb`，在下载目录执行：
+
+```bash
+sudo apt install ./Muse-Desktop-1.1.0-linux-x64.deb
+```
+
+然后从应用菜单打开 **Muse Desktop**，或运行 `muse-desktop`。其他发行版可运行 AppImage：
+
+```bash
+chmod +x Muse-Desktop-1.1.0-linux-x64.AppImage
+./Muse-Desktop-1.1.0-linux-x64.AppImage
+```
+
+需要图形桌面及 GTK 3、NSS、GBM 等常规桌面库，AppImage 需要可用的用户命名空间。Linux 版本以 Ubuntu 22.04 构建和验证。Ubuntu/Debian 遇到 AppImage 的沙箱限制时，请使用 `.deb`。
+
+关闭进入托盘需要桌面支持 StatusNotifier/AppIndicator；GNOME 可启用 AppIndicator 扩展。没有可用托盘时，关闭会退出程序。窗口大小、位置和最大化状态会保存。
+
+登录状态使用 GNOME Keyring / KWallet 保存，需正常运行并解锁的系统密钥环；密钥环不可用时，重启后可能需要重新登录。应用数据位于 `${XDG_CONFIG_HOME:-~/.config}/MuseDesktop`，不共享 Edge 或其他浏览器的账户，也不包含发布者的数据。卸载 `.deb` 可执行 `sudo apt remove muse-desktop`，用户数据会保留。
 
 ## 推荐：安装版
 
@@ -20,4 +41,4 @@ Muse.ai 非官方 Windows 桌面客户端。适用于 Windows 10 2004 及以上�
 
 软件自动记住窗口大小、位置和最大化状态。应用数据位于 `%USERPROFILE%\AppData\Local\MuseDesktop`。卸载程序时会保留此数据，方便重新安装后继续使用。
 
-下载页的 `SHA256SUMS.txt` 可用于核对发行文件是否完整。
+下载页的 `SHA256SUMS.txt` / `SHA256SUMS-linux.txt` 可用于核对发行文件是否完整。
