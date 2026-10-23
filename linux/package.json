@@ -1,0 +1,45 @@
+{
+    "name": "muse-desktop",
+    "productName": "Muse Desktop",
+    "version": "1.1.0",
+    "description": "Unofficial Muse.ai desktop client",
+    "author": "tszmzz1026 <281636197+tszmzz1026@users.noreply.github.com>",
+    "homepage": "https://github.com/tszmzz1026/muse-desktop",
+    "main": "src/main.cjs",
+    "scripts": {
+        "start": "electron .",
+        "test": "node --test tests/*.test.cjs",
+        "test:integration": "electron tests/integration.cjs",
+        "dist": "electron-builder --linux --x64 --publish never"
+    },
+    "devDependencies": {
+        "electron": "45.0.0",
+        "electron-builder": "26.15.3"
+    },
+    "build": {
+        "appId": "io.github.tszmzz1026.muse-desktop",
+        "asar": true,
+        "toolsets": { "appimage": "1.0.3" },
+        "appImage": { "executableArgs": ["--enable-sandbox"] },
+        "directories": { "output": "../release/linux" },
+        "files": ["src/**/*", "assets/**/*", "package.json"],
+        "linux": {
+            "target": ["AppImage", "deb"],
+            "executableName": "muse-desktop",
+            "category": "Network",
+            "icon": "assets/muse.png",
+            "artifactName": "Muse-Desktop-${version}-linux-${arch}.${ext}",
+            "desktop": {
+                "entry": {
+                    "Name": "Muse Desktop",
+                    "Comment": "Muse.ai desktop client",
+                    "StartupWMClass": "muse-desktop"
+                }
+            }
+        },
+        "deb": {
+            "depends": ["libgtk-3-0", "libnotify4", "libnss3", "libxss1", "libxtst6", "xdg-utils", "libatspi2.0-0", "libuuid1", "libsecret-1-0", "libgbm1"],
+            "recommends": ["libayatana-appindicator3-1", "gnome-keyring"]
+        }
+    }
+}

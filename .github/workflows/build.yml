@@ -1,4 +1,4 @@
-name: Build Windows packages
+name: Build desktop packages
 
 on:
   push:
@@ -10,6 +10,54 @@ permissions:
   contents: read
 
 jobs:
+  linux:
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: linux
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: linux/package-lock.json
+      - name: Install desktop test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb openbox xdotool dbus-x11 gnome-keyring libsecret-1-0 libgtk-3-0 libnss3 libgbm1 libasound2 libxss1 libxtst6 libnotify4
+      - run: npm ci --no-audit --no-fund
+      - run: npm test
+      - name: Test Linux window and encrypted session persistence
+        run: |
+          export XDG_RUNTIME_DIR="${RUNNER_TEMP}/muse-runtime"
+          mkdir -p "$XDG_RUNTIME_DIR"
+          chmod 700 "$XDG_RUNTIME_DIR"
+          xvfb-run -a -s '-screen 0 1440x1000x24' dbus-run-session -- bash tests/run-linux.sh
+      - name: Build AppImage and Debian packages
+        run: npm run dist
+      - name: Test installed Debian package and AppImage
+        run: |
+          sudo apt-get install -y ../release/linux/*.deb
+          export XDG_RUNTIME_DIR="${RUNNER_TEMP}/muse-runtime-packages"
+          mkdir -p "$XDG_RUNTIME_DIR"
+          chmod 700 "$XDG_RUNTIME_DIR"
+          xvfb-run -a -s '-screen 0 1440x1000x24' dbus-run-session -- bash tests/packages.sh
+      - name: Generate checksums
+        working-directory: release/linux
+        run: sha256sum *.AppImage *.deb > SHA256SUMS-linux.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Muse-Desktop-linux-x64
+          path: |
+            release/linux/*.AppImage
+            release/linux/*.deb
+            release/linux/SHA256SUMS-linux.txt
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Linux-test-logs
+          path: ${{ runner.temp }}/muse-runtime*/**/*.log
   windows:
     runs-on: windows-2022
     steps:

@@ -14,3 +14,5 @@ window_state.json
 WebView2/
 session-cookies.dat
 session-cookies.dat.tmp
+node_modules/
+linux/.cache/
