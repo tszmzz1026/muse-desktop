@@ -8,9 +8,10 @@ const { app, session, BrowserWindow, screen } = require("electron");
 const { MuseClient } = require("../src/client.cjs");
 
 const directory = fs.mkdtempSync(path.join(os.tmpdir(), "muse-ui-test-"));
+process.on("uncaughtException", (error) => { console.error(error); app.exit(1); });
+app.on("window-all-closed", () => {});
 app.setPath("userData", directory);
 app.enableSandbox();
-console.log("[DEBUG-linux] main loaded");
 
 async function wait_until(predicate) {
     const deadline = Date.now() + 7000;
@@ -21,16 +22,13 @@ async function wait_until(predicate) {
 }
 
 app.whenReady().then(async () => {
-    console.log("[DEBUG-linux] app ready");
     let exit_requested = false;
     let tray_present = true;
     const options = { browser_session: session.fromPartition("persist:ui-test"),
         state_path: path.join(directory, "window_state.json"),
         tray_available: async () => tray_present, on_exit: () => { exit_requested = true; } };
     let client = new MuseClient(options);
-    console.log("[DEBUG-linux] opening view");
     const view = await client.open("about:blank");
-    console.log("[DEBUG-linux] view ready");
     assert.equal(BrowserWindow.getAllWindows().length, 1);
     assert.deepEqual(view.getBounds(), { x: 0, y: 0, width: client.window.getContentSize()[0], height: client.window.getContentSize()[1] });
     assert.equal(view.webContents.getLastWebPreferences().sandbox, true);
@@ -41,16 +39,13 @@ app.whenReady().then(async () => {
     await wait_until(() => !client.window.isVisible());
     assert.equal(exit_requested, false);
     client.restore();
-    console.log("[DEBUG-linux] tray restored");
     assert.equal(await view.webContents.executeJavaScript("document.querySelector('input').value"), "unsent draft");
     await view.webContents.executeJavaScript("window.received = false; window.addEventListener('message', () => { window.received = true; }); void window.open('about:blank', 'oauth')");
     await wait_until(() => client.views.length === 2);
     assert.equal(BrowserWindow.getAllWindows().length, 1);
     const popup = client.views.at(-1);
-    console.log("[DEBUG-linux] popup ready");
     await popup.webContents.executeJavaScript("window.opener.postMessage('auth-done', '*'); setTimeout(() => window.close(), 30); void 0");
     await wait_until(() => client.views.length === 1);
-    console.log("[DEBUG-linux] popup closed");
     assert.equal(await view.webContents.executeJavaScript("window.received"), true);
     assert.equal(await view.webContents.executeJavaScript("document.querySelector('input').value"), "unsent draft");
     const area = screen.getPrimaryDisplay().workArea;
@@ -61,7 +56,17 @@ app.whenReady().then(async () => {
     client.dispose();
     client = new MuseClient(options);
     await client.open("about:blank");
-    assert.deepEqual(client.window.getNormalBounds(), previous);
+    const restored = client.window.getNormalBounds();
+    for (const dimension of ["x", "y", "width", "height"]) {
+        assert.ok(Math.abs(restored[dimension] - previous[dimension]) <= (process.platform === "win32" ? 2 : 0), `${dimension} was not restored`);
+    }
+    client.window.maximize();
+    await wait_until(() => client.window.isMaximized());
+    client.save_state();
+    client.dispose();
+    client = new MuseClient(options);
+    await client.open("about:blank");
+    await wait_until(() => client.window.isMaximized());
     tray_present = false;
     client.window.close();
     await wait_until(() => exit_requested);

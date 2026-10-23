@@ -65,8 +65,12 @@ class MuseClient {
         return view;
     }
 
-    add_view(preferences) {
-        const view = new WebContentsView({ webPreferences: { ...preferences, ...this.preferences } });
+    add_view(preferences, existing_contents) {
+        const options = { webPreferences: { ...preferences, ...this.preferences } };
+        if (existing_contents) {
+            options.webContents = existing_contents;
+        }
+        const view = new WebContentsView(options);
         const previous = this.views.at(-1);
         if (previous) {
             this.window.contentView.removeChildView(previous);
@@ -81,7 +85,7 @@ class MuseClient {
             }
             return {
                 action: "allow",
-                createWindow: (options) => this.add_view(options.webPreferences).webContents
+                createWindow: (options) => this.add_view(options.webPreferences, options.webContents).webContents
             };
         });
         contents.on("will-navigate", (event, url) => {

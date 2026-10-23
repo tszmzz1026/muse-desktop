@@ -18,7 +18,8 @@ function write_private(file_path, data) {
 
 function read_state(file_path) {
     try {
-        return JSON.parse(fs.readFileSync(file_path, "utf8"));
+        const saved = JSON.parse(fs.readFileSync(file_path, "utf8"));
+        return saved && typeof saved === "object" && !Array.isArray(saved) ? saved : {};
     } catch {
         return {};
     }

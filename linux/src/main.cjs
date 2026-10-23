@@ -1,6 +1,7 @@
 "use strict";
 
 const path = require("node:path");
+const fs = require("node:fs");
 const { app, session, safeStorage, Menu, dialog } = require("electron");
 const { MuseClient } = require("./client.cjs");
 const { SessionStore } = require("./session_store.cjs");
@@ -8,7 +9,9 @@ const { is_muse_domain } = require("./state.cjs");
 
 app.setName("Muse Desktop");
 app.enableSandbox();
-app.setPath("userData", path.join(app.getPath("appData"), "MuseDesktop"));
+const user_directory = path.join(app.getPath("appData"), "MuseDesktop");
+fs.mkdirSync(user_directory, { recursive: true, mode: 0o700 });
+app.setPath("userData", user_directory);
 
 let client;
 let store;
