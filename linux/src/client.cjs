@@ -119,7 +119,7 @@ class MuseClient {
 
     remove_view(view) {
         const index = this.views.indexOf(view);
-        if (index < 0 || this.exiting) {
+        if (index < 0 || this.exiting || this.window.isDestroyed()) {
             return;
         }
         const was_active = this.views.at(-1) === view;

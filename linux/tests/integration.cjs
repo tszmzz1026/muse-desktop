@@ -56,9 +56,10 @@ app.whenReady().then(async () => {
     client.dispose();
     client = new MuseClient(options);
     await client.open("about:blank");
+    await new Promise((resolve) => setTimeout(resolve, 400));
     const restored = client.window.getNormalBounds();
     for (const dimension of ["x", "y", "width", "height"]) {
-        assert.ok(Math.abs(restored[dimension] - previous[dimension]) <= (process.platform === "win32" ? 2 : 0), `${dimension} was not restored`);
+        assert.ok(Math.abs(restored[dimension] - previous[dimension]) <= (process.platform === "win32" ? 2 : 0), `${dimension} was not restored: ${JSON.stringify({ previous, restored })}`);
     }
     client.window.maximize();
     await wait_until(() => client.window.isMaximized());
