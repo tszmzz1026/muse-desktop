@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
@@ -17,6 +19,7 @@ internal interface IAppView : IDisposable
     void show(Rectangle bounds, bool activate);
     void hide();
     void close();
+    Task save_state_async();
 }
 
 internal sealed class WebAppView : IAppView
@@ -27,12 +30,20 @@ internal sealed class WebAppView : IAppView
     private readonly List<WebView2> _views = new List<WebView2>();
     private CoreWebView2Environment _environment;
     private bool _disposed;
+    private readonly SessionCookieStore _session_store;
+    private readonly Timer _session_timer;
+    private Task _save_task = Task.FromResult(0);
+    private bool _save_again;
 
     internal WebAppView(Control host, string data_path, string start_url)
     {
         _host = host;
         _data_path = data_path;
         _start_url = start_url;
+        _session_store = new SessionCookieStore(data_path);
+        _session_timer = new Timer();
+        _session_timer.Interval = 5000;
+        _session_timer.Tick += async delegate { await save_state_async(); };
         error_message = "";
     }
 
@@ -56,6 +67,7 @@ internal sealed class WebAppView : IAppView
     private void configure_view(WebView2 view)
     {
         view.CoreWebView2.NewWindowRequested += open_popup;
+        view.CoreWebView2.NavigationCompleted += async delegate { await save_state_async(); };
         view.CoreWebView2.WindowCloseRequested += delegate
         {
             if (_views.Count > 1)
@@ -81,9 +93,12 @@ internal sealed class WebAppView : IAppView
             WebView2 view = create_view();
             await view.EnsureCoreWebView2Async(_environment);
             if (_disposed) { return; }
+            await _session_store.restore_async(view.CoreWebView2.CookieManager);
+            if (_disposed) { return; }
             configure_view(view);
             view.CoreWebView2.Navigate(_start_url);
             is_ready = true;
+            _session_timer.Start();
             show(Rectangle.Empty, false);
         }
         catch (WebView2RuntimeNotFoundException) { error_message = "请先安装 Microsoft Edge WebView2 Runtime。"; }
@@ -138,6 +153,33 @@ internal sealed class WebAppView : IAppView
 
     public void poll() { }
 
+    public Task save_state_async()
+    {
+        if (_disposed || !is_ready || _views.Count == 0) { return Task.FromResult(0); }
+        if (_save_task.IsCompleted) { _save_task = save_session_safely_async(); }
+        else { _save_again = true; }
+        return _save_task;
+    }
+
+    private async Task save_session_safely_async()
+    {
+        try
+        {
+            do
+            {
+                _save_again = false;
+                await _session_store.save_async(_views[0].CoreWebView2.CookieManager);
+            }
+            while (_save_again && !_disposed && _views.Count > 0);
+        }
+        catch (COMException) { }
+        catch (InvalidOperationException) { }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
+        catch (CryptographicException) { }
+        catch (ArgumentException) { }
+    }
+
     public void show(Rectangle bounds, bool activate)
     {
         WebView2 view = active_view;
@@ -156,6 +198,8 @@ internal sealed class WebAppView : IAppView
     {
         if (_disposed) { return; }
         _disposed = true;
+        _session_timer.Stop();
+        _session_timer.Dispose();
         is_ready = false;
         is_starting = false;
         foreach (WebView2 view in _views) { view.Dispose(); }

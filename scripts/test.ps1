@@ -10,7 +10,7 @@ $icon_path = Join-Path $output_path "muse.ico"
 $manifest_path = Join-Path $project_path "src\app.manifest"
 $core_path = Join-Path $output_path "Microsoft.Web.WebView2.Core.dll"
 $forms_path = Join-Path $output_path "Microsoft.Web.WebView2.WinForms.dll"
-& $compiler_path /nologo /target:winexe /main:MuseTests /platform:x64 /utf8output /codepage:65001 "/out:$test_path" "/win32icon:$icon_path" "/win32manifest:$manifest_path" /reference:System.Windows.Forms.dll /reference:System.Drawing.dll /reference:System.Web.Extensions.dll "/reference:$core_path" "/reference:$forms_path" $source_paths
+& $compiler_path /nologo /target:winexe /main:MuseTests /platform:x64 /utf8output /codepage:65001 "/out:$test_path" "/win32icon:$icon_path" "/win32manifest:$manifest_path" /reference:System.Windows.Forms.dll /reference:System.Drawing.dll /reference:System.Web.Extensions.dll /reference:System.Core.dll /reference:System.Security.dll "/reference:$core_path" "/reference:$forms_path" $source_paths
 if ($LASTEXITCODE -ne 0) { throw "Tray test compilation failed." }
 $test_arguments = @()
 if ($Integration) { $test_arguments = @("--integration") }

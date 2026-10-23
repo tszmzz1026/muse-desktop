@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
 
@@ -19,6 +20,7 @@ internal sealed class FakeAppView : IAppView
     public void show(Rectangle bounds, bool activate) { visible = true; }
     public void hide() { visible = false; }
     public void close() { closed = true; visible = false; is_ready = false; }
+    public Task save_state_async() { return Task.FromResult(0); }
     public void Dispose() { close(); }
 }
 

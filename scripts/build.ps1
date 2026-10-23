@@ -66,7 +66,7 @@ if ($build_filename -notin @("Muse.exe", "Muse.next.exe")) { throw "Unsupported 
 $executable_path = Join-Path $output_path $build_filename
 $source_paths = @(Get-ChildItem -LiteralPath (Join-Path $project_path "src") -Filter "*.cs" | ForEach-Object { $_.FullName })
 $manifest_path = Join-Path $project_path "src\app.manifest"
-& $compiler_path /nologo /target:winexe /platform:x64 /optimize+ /utf8output /codepage:65001 "/out:$executable_path" "/win32icon:$icon_path" "/win32manifest:$manifest_path" /reference:System.Windows.Forms.dll /reference:System.Drawing.dll /reference:System.Web.Extensions.dll "/reference:$core_path" "/reference:$forms_path" $source_paths
+& $compiler_path /nologo /target:winexe /platform:x64 /optimize+ /utf8output /codepage:65001 "/out:$executable_path" "/win32icon:$icon_path" "/win32manifest:$manifest_path" /reference:System.Windows.Forms.dll /reference:System.Drawing.dll /reference:System.Web.Extensions.dll /reference:System.Core.dll /reference:System.Security.dll "/reference:$core_path" "/reference:$forms_path" $source_paths
 if ($LASTEXITCODE -ne 0) {
     throw "Muse 编译失败，退出码：$LASTEXITCODE"
 }

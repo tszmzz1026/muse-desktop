@@ -29,6 +29,9 @@ jobs:
       - name: Test WebView2 interface
         shell: powershell
         run: ./scripts/test.ps1 -Integration
+      - name: Test login persistence across browser restarts
+        shell: powershell
+        run: ./scripts/test_login_persistence.ps1
       - uses: actions/upload-artifact@v4
         with:
           name: Muse-Desktop-windows-x64

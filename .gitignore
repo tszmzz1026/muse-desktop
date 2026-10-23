@@ -12,3 +12,5 @@
 diagnostics.json
 window_state.json
 WebView2/
+session-cookies.dat
+session-cookies.dat.tmp

@@ -15,6 +15,7 @@ internal sealed class MuseWindow : Form
     private readonly Button _retry_button;
     private readonly WindowPlacement _placement;
     private bool _exit_requested;
+    private bool _exit_pending;
     private bool _was_ready;
 
     internal MuseWindow(Func<Control, IAppView> create_app_view, EventWaitHandle activate_event, EventWaitHandle exit_event, string settings_path = null)
@@ -146,8 +147,12 @@ internal sealed class MuseWindow : Form
         sync_page(true);
     }
 
-    internal void exit_application()
+    internal async void exit_application()
     {
+        if (_exit_pending || _exit_requested || IsDisposed) { return; }
+        _exit_pending = true;
+        await _app_view.save_state_async();
+        if (IsDisposed) { return; }
         _exit_requested = true;
         Close();
     }

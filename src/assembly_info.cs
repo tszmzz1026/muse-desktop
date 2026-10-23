@@ -4,5 +4,5 @@ using System.Reflection;
 [assembly: AssemblyDescription("Unofficial Muse.ai desktop client")]
 [assembly: AssemblyProduct("Muse Desktop")]
 [assembly: AssemblyCompany("tszmzz1026")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.0.1.0")]
+[assembly: AssemblyFileVersion("1.0.1.0")]
