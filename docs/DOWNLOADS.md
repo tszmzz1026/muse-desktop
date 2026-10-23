@@ -13,8 +13,8 @@ sudo apt install ./Muse-Desktop-1.1.0-linux-amd64.deb
 然后从应用菜单打开 **Muse Desktop**，或运行 `muse-desktop`。其他发行版可运行 AppImage：
 
 ```bash
-chmod +x Muse-Desktop-1.1.0-linux-x64.AppImage
-./Muse-Desktop-1.1.0-linux-x64.AppImage
+chmod +x Muse-Desktop-1.1.0-linux-x86_64.AppImage
+./Muse-Desktop-1.1.0-linux-x86_64.AppImage
 ```
 
 需要图形桌面及 GTK 3、NSS、GBM 等常规桌面库，AppImage 需要可用的用户命名空间。Linux 版本以 Ubuntu 22.04 构建和验证。Ubuntu/Debian 遇到 AppImage 的沙箱限制时，请使用 `.deb`。

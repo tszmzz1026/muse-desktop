@@ -15,8 +15,8 @@ sudo apt install ./Muse-Desktop-1.1.0-linux-amd64.deb
 其他发行版可给 AppImage 添加执行权限后运行，需要图形桌面、GTK 3、NSS、GBM 和可用的用户命名空间。系统限制 AppImage 沙箱时，Ubuntu/Debian 请使用 `.deb`。
 
 ```bash
-chmod +x Muse-Desktop-1.1.0-linux-x64.AppImage
-./Muse-Desktop-1.1.0-linux-x64.AppImage
+chmod +x Muse-Desktop-1.1.0-linux-x86_64.AppImage
+./Muse-Desktop-1.1.0-linux-x86_64.AppImage
 ```
 
 ## 使用
