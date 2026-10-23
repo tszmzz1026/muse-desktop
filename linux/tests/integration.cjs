@@ -49,7 +49,7 @@ app.whenReady().then(async () => {
     assert.equal(await view.webContents.executeJavaScript("window.received"), true);
     assert.equal(await view.webContents.executeJavaScript("document.querySelector('input').value"), "unsent draft");
     const area = screen.getPrimaryDisplay().workArea;
-    client.window.setBounds({ x: area.x + 10, y: area.y + 10, width: 900, height: 650 });
+    client.window.setBounds({ x: area.x + 80, y: area.y + 80, width: 900, height: 650 });
     await new Promise((resolve) => setTimeout(resolve, 400));
     const previous = client.window.getNormalBounds();
     client.save_state();
