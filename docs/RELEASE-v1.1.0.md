@@ -2,7 +2,7 @@
 
 新增 Linux x86_64 客户端，直接在独立窗口内使用 Muse.ai。
 
-- `Muse-Desktop-1.1.0-linux-x64.deb`：Ubuntu / Debian / Linux Mint 推荐安装包，安装后可从应用菜单启动。
+- `Muse-Desktop-1.1.0-linux-amd64.deb`：Ubuntu / Debian / Linux Mint 推荐安装包，安装后可从应用菜单启动。
 - `Muse-Desktop-1.1.0-linux-x64.AppImage`：便携运行，添加执行权限后打开。
 - 单主窗口；登录弹页在同一窗口中切换，不产生第二个窗口。
 - 支持托盘、单实例、保留未发送内容和恢复上次窗口大小。

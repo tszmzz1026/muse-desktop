@@ -9,7 +9,7 @@ Muse.ai 非官方桌面客户端。Windows 使用微软 WebView2，Linux 使用 
 Linux 提供 x86_64 的 `.deb` 和 `.AppImage`，以 Ubuntu 22.04 为构建与验证环境；Ubuntu、Debian、Linux Mint 等桌面系统可使用。ARM64 暂未提供。Ubuntu/Debian 推荐安装 `.deb`，会添加应用菜单入口并自动处理依赖。
 
 ```bash
-sudo apt install ./Muse-Desktop-1.1.0-linux-x64.deb
+sudo apt install ./Muse-Desktop-1.1.0-linux-amd64.deb
 ```
 
 其他发行版可给 AppImage 添加执行权限后运行，需要图形桌面、GTK 3、NSS、GBM 和可用的用户命名空间。系统限制 AppImage 沙箱时，Ubuntu/Debian 请使用 `.deb`。

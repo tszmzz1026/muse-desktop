@@ -7,7 +7,7 @@ Muse.ai 非官方 Windows / Linux 桌面客户端。Windows 支持 Windows 10 20
 Ubuntu / Debian / Linux Mint 推荐下载 `.deb`，在下载目录执行：
 
 ```bash
-sudo apt install ./Muse-Desktop-1.1.0-linux-x64.deb
+sudo apt install ./Muse-Desktop-1.1.0-linux-amd64.deb
 ```
 
 然后从应用菜单打开 **Muse Desktop**，或运行 `muse-desktop`。其他发行版可运行 AppImage：

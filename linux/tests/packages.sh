@@ -13,7 +13,7 @@ check_launch() {
     local application_pid=$!
     local window_id=""
     for attempt in {1..40}; do
-        window_id="$(xdotool search --onlyvisible --pid "$application_pid" 2>/dev/null | head -n 1 || true)"
+        window_id="$(xdotool search --onlyvisible --name 'Muse Desktop' 2>/dev/null | head -n 1 || true)"
         if [[ -n "$window_id" ]]; then break; fi
         if ! kill -0 "$application_pid" 2>/dev/null; then
             cat "${XDG_RUNTIME_DIR}/${label}.log"
@@ -21,9 +21,15 @@ check_launch() {
         fi
         sleep 0.5
     done
-    test -n "$window_id"
+    if [[ -z "$window_id" ]]; then
+        cat "${XDG_RUNTIME_DIR}/${label}.log"
+        echo "FAIL ${label}: no application window"
+        return 1
+    fi
+    local browser_pid
+    browser_pid="$(xdotool getwindowpid "$window_id")"
     APPIMAGE_EXTRACT_AND_RUN=1 timeout 15 "$executable"
-    test "$(xdotool search --onlyvisible --pid "$application_pid" | wc -l)" -eq 1
+    test "$(xdotool search --onlyvisible --pid "$browser_pid" | wc -l)" -eq 1
     xdotool windowactivate --sync "$window_id"
     xdotool key alt+F4
     for attempt in {1..40}; do
